@@ -30,7 +30,7 @@ async def convert(
 @router.get("/health")
 async def health(request: Request):
     start_time = request.app.state.start_time
-    up_time= start_time- dt.now()
+    up_time= dt.now()-start_time 
     return {
         "message": "healthy",
         "status": 200,
