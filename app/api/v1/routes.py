@@ -16,8 +16,8 @@ async def convert(
     to_currency: str = Query(...),
     amount: float = Query(...)
 ):
-    from_currency = from_currency.upper()
-    to_currency = to_currency.upper()
+    from_currency = from_currency.strip().upper()
+    to_currency = to_currency.strip().upper()
     response = await convert_currency(from_currency, to_currency, amount)
     return {'response': response["result"], 'data': {
         'from_currency': response["base_code"],

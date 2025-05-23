@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from  .api.v1.routes import router as api_v1_router
+from .api.v1.routes import router as api_v1_router
 from .lifespan import lifespan
 from .core.config import settings
 
