@@ -15,13 +15,14 @@ def homeRoute() -> Dict[str, str]:
 @router.get(path="/health")
 async def health(request: Request) -> dict[str, Any]:
     start_time = request.app.state.start_time
-    up_time= dt.now()-start_time 
+    up_time = dt.now() - start_time
+    readable_up_time = str(up_time).split('.')[0]  # Remove microseconds for readability
     return {
         "message": "healthy",
         "status": 200,
         "version": "1.0.0",
-        "start_time": start_time,
-        "up_time": up_time
+        "start_time": start_time.isoformat(),
+        "up_time": readable_up_time
     }
 
 @router.get(
