@@ -51,8 +51,6 @@ async def convert(
         amount=amount
     )
     
-    print(f"Conversion request data: {conversion_data=}")
-
 
     # Get conversion data from service
     response = await convert_currency(
@@ -61,8 +59,6 @@ async def convert(
         amount=conversion_data.amount
     )
 
-    # Check if the response contains the expected keys
-    print(f"Conversion response: {response=}")
     
     # Construct response using Pydantic models
     return ConversionResponse(

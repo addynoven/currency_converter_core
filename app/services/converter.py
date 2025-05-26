@@ -7,8 +7,6 @@ async def convert_currency(from_currency: str, to_currency: str, amount: float) 
     try:
         base_data = await get_usd_rates()
         rates = base_data["conversion_rates"]
-        # print(f"Rates fetched: {rates=}")
-        print(f"from {from_currency=} to {to_currency=}")
         if from_currency not in rates or to_currency not in rates:
             raise CurrencyConversionError(detail="Unsupported currency code")
             
