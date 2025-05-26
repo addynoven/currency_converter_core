@@ -45,18 +45,20 @@ async def convert(
         ConversionResponse: Conversion result with additional metadata
     """
     # Validate input parameters
-    ConversionDataRequest(
+    conversion_data = ConversionDataRequest(
         base_code=from_currency,
         target_code=to_currency,
         amount=amount
     )
-
     
+    print(f"Conversion request data: {conversion_data=}")
+
+
     # Get conversion data from service
     response = await convert_currency(
-        from_currency=from_currency,
-        to_currency=to_currency,
-        amount=amount
+        from_currency=conversion_data.base_code,
+        to_currency=conversion_data.target_code,
+        amount=conversion_data.amount
     )
 
     # Check if the response contains the expected keys

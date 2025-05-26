@@ -6,6 +6,17 @@ class ConversionDataRequest(BaseModel):
     target_code: str = Field(..., description="Target currency code (e.g., EUR)")
     amount: float = Field(..., description="Amount to convert", gt=0)
 
+    @field_validator("base_code", "target_code", mode="before")
+    @classmethod
+    def normalize_currency(cls, v: Any) -> str:
+        """
+        Normalize currency codes by stripping whitespace and converting to uppercase.
+        If the currency code is not a string, a ValueError is raised.
+        """
+        if not isinstance(v, str):
+            raise ValueError("Currency codes must be strings")
+        return v.strip().upper()
+
 class ConversionResponse(BaseModel):
     base_code: str = Field(..., description="Source currency code")
     target_code: str = Field(..., description="Target currency code")
@@ -15,6 +26,10 @@ class ConversionResponse(BaseModel):
     @field_validator("base_code", "target_code", mode="before")
     @classmethod
     def normalize_currency(cls, v: Any) -> str:
+        """
+        Normalize currency codes by stripping whitespace and converting to uppercase.
+        If the currency code is not a string, a ValueError is raised.
+        """
         if not isinstance(v, str):
             raise ValueError("Currency codes must be strings")
         return v.strip().upper()
