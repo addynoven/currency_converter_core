@@ -1,34 +1,19 @@
 from datetime import datetime as dt
-from fastapi import APIRouter, Query, Request
+from typing import  Dict, Any
+from fastapi import APIRouter, Request, Query
 from app.services.converter import convert_currency
+
+from app.api.v1.validation.dtos import ConversionDataRequest, ConversionResponse
 
 router = APIRouter()
 
-@router.get("/")
-def homeRoute():
+@router.get(path="/")
+def homeRoute() -> Dict[str, str]:
     return {"message": "welcome to the currency converter api..."}
 
 
-# to hit this route you need u can do it by localhost:8000/api/v1/convert/?from_currency=USD&to_currency=EUR&amount=100
-@router.get("/convert")
-async def convert(
-    from_currency: str = Query(...),
-    to_currency: str = Query(...),
-    amount: float = Query(...)
-):
-    from_currency = from_currency.strip().upper()
-    to_currency = to_currency.strip().upper()
-    response = await convert_currency(from_currency, to_currency, amount)
-    return {'response': response["result"], 'data': {
-        'from_currency': response["base_code"],
-        'to_currency': response["target_code"],
-        "conversion_rate": response["conversion_rate"],
-        "conversion_result": response["conversion_result"]
-    } }
-
-
-@router.get("/health")
-async def health(request: Request):
+@router.get(path="/health")
+async def health(request: Request) -> dict[str, Any]:
     start_time = request.app.state.start_time
     up_time= dt.now()-start_time 
     return {
@@ -38,3 +23,52 @@ async def health(request: Request):
         "start_time": start_time,
         "up_time": up_time
     }
+
+@router.get(
+    path="/convert",
+    response_model=ConversionResponse,
+    description="Convert amount from one currency to another"
+)
+async def convert(
+    from_currency: str = Query(..., description="Source currency code (e.g., USD)", example="USD"),
+    to_currency: str = Query(..., description="Target currency code (e.g., EUR)", example="EUR"),
+    amount: float = Query(..., description="Amount to convert", example=100.00, gt=0)
+) -> ConversionResponse:
+    """Convert an amount from one currency to another.
+    
+    Args:
+        from_currency: Source currency code (e.g., USD)
+        to_currency: Target currency code (e.g., EUR)
+        amount: Amount to convert
+        
+    Returns:
+        ConversionResponse: Conversion result with additional metadata
+    """
+    # Validate input parameters
+    ConversionDataRequest(
+        base_code=from_currency,
+        target_code=to_currency,
+        amount=amount
+    )
+
+    
+    # Get conversion data from service
+    response = await convert_currency(
+        from_currency=from_currency,
+        to_currency=to_currency,
+        amount=amount
+    )
+
+    # Check if the response contains the expected keys
+    print(f"Conversion response: {response=}")
+    
+    # Construct response using Pydantic models
+    return ConversionResponse(
+        base_code=response["base_code"],
+        target_code=response["target_code"],
+        conversion_rate=response["conversion_rate"],
+        conversion_result=response["conversion_result"]
+    )
+    
+
+
