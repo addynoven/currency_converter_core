@@ -9,8 +9,8 @@ app = FastAPI(title=settings.app_name,version=settings.version,lifespan=lifespan
 register_error_handlers(app)  # Add this after app creation
 
 app.include_router(router=api_v1_router, prefix="/api/v1")
-app.include_router(help_router, prefix="/help")
-app.include_router(help_router, prefix="/api/v1")
+app.include_router(router=help_router, prefix="/help")
+app.include_router(router=help_router, prefix="/api/v1/help")
 
 @app.get(path="/")
 async def root() -> dict[str, str]:
