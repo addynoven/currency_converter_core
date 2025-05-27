@@ -3,6 +3,9 @@ from .api_client import fetch_usd_rates
 from typing import Any, Dict
 from datetime import datetime, timezone
 from functools import wraps
+from typing import Optional
+from typing import Callable, Awaitable, TypeVar
+
 
 class APIFetchError(Exception):
     """Custom exception for API fetch failures."""
@@ -10,21 +13,20 @@ class APIFetchError(Exception):
         super().__init__(message)
         self.data = data
 
-from datetime import datetime, timezone
-from functools import wraps
 
+T = TypeVar("T")
 
-def daily_cache(func):
-    cache_data = None
+def daily_cache(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
+    cache_data: Optional[Any] = None
     cached_date = None
 
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
+    @wraps(wrapped=func)
+    async def wrapper(*args: Any, **kwargs: Any) -> T:
         nonlocal cache_data, cached_date
         
-        current_date = datetime.now(timezone.utc).date()
+        current_date = datetime.now(tz=timezone.utc).date()
         
-        if cached_date != current_date:
+        if cached_date is None or cached_date != current_date:
             cache_data = None
 
         if cache_data is None:
@@ -51,4 +53,4 @@ async def get_usd_rates() -> Dict[str, Any]:
     else:
         # You could log the error here before raising
         error_message = "Failed to fetch USD rates from API."
-        raise APIFetchError(error_message, base_data)
+        raise APIFetchError(message=error_message, data=base_data)
