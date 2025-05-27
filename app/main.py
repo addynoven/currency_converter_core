@@ -14,7 +14,7 @@ app.include_router(help_router, prefix="/api/v1")
 
 @app.get(path="/")
 async def root() -> dict[str, str]:
-    return {"message":"welcome to the currency converter api... v1.0.0 to use the api please prefix /api/v1"}
+    return {"message":"welcome to the currency converter api... v1.0.0 to use the api please prefix /api/v1 and for help use /help or /api/v1/help also we have docs at https://currency-converter-core.onrender.com/docs"}
 
 
 

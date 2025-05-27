@@ -5,7 +5,7 @@ from app.api.home_route.validation.dtos import HelpResponse
 router = APIRouter()
 
 @router.get("/", summary="API usage instructions and supported currencies", response_model=HelpResponse)
-def help_route() -> dict:
+def help_route() -> HelpResponse:
     supported_currencies = sorted([
         "USD", "AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM", "BBD", "BDT", "BGN", "BHD",
         "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD", "CAD", "CDF", "CHF", "CLP", "CNY", "COP",
@@ -19,16 +19,16 @@ def help_route() -> dict:
         "TZS", "UAH", "UGX", "UYU", "UZS", "VES", "VND", "VUV", "WST", "XAF", "XCD", "XCG", "XDR", "XOF", "XPF", "YER",
         "ZAR", "ZMW", "ZWL"
     ])
-    return {
-        "result": "success",
-        "description": "Welcome to the Currency Converter API. This endpoint provides usage instructions and a full list of supported currencies.",
-        "usage_example": "https://currency-converter-core.onrender.com/api/v1/convert?from_currency=USD&to_currency=EUR&amount=100",
-        "endpoints": {
+    return HelpResponse(
+        result="success",
+        description="Welcome to the Currency Converter API. This endpoint provides usage instructions and a full list of supported currencies.",
+        usage_example="https://currency-converter-core.onrender.com/api/v1/convert?from_currency=USD&to_currency=EUR&amount=100",
+        endpoints={
             "/convert": "Convert amount from one currency to another",
             "/latest": "Get the latest exchange rates",
             "/help": "API usage guide and supported currencies"
         },
-        "documentation": "https://www.exchangerate-api.com/docs",
-        "terms_of_use": "https://www.exchangerate-api.com/terms",
-        "supported_currencies": supported_currencies
-    }
+        documentation="https://www.exchangerate-api.com/docs",
+        terms_of_use="https://www.exchangerate-api.com/terms",
+        supported_currencies=supported_currencies
+    )
