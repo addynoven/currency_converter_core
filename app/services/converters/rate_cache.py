@@ -1,6 +1,8 @@
 from app.services.redis_service import get_cached_conversion, set_cached_conversion
 from .api_client import fetch_usd_rates
 from typing import Any, Dict
+from datetime import datetime, timezone
+from functools import wraps
 
 class APIFetchError(Exception):
     """Custom exception for API fetch failures."""
@@ -8,6 +10,33 @@ class APIFetchError(Exception):
         super().__init__(message)
         self.data = data
 
+from datetime import datetime, timezone
+from functools import wraps
+
+
+def daily_cache(func):
+    cache_data = None
+    cached_date = None
+
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        nonlocal cache_data, cached_date
+        
+        current_date = datetime.now(timezone.utc).date()
+        
+        if cached_date != current_date:
+            cache_data = None
+
+        if cache_data is None:
+            cache_data = await func(*args, **kwargs)
+            cached_date = current_date
+
+        return cache_data
+
+    return wrapper
+
+
+@daily_cache
 async def get_usd_rates() -> Dict[str, Any]:
     base_key = "conversion:USD:all"
     # Attempt to get cached data first
